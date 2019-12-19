@@ -267,11 +267,62 @@ function bucketSort(arr, min, max) {
 }
 
 
-console.log(bucketSort([1, 1, 1, 4, 2, 4, 3, 5], 1, 5));
+//console.log(bucketSort([1, 1, 1, 4, 2, 4, 3, 5], 1, 5));
+
 // 7. Sort in place
+function shuffle(arr) {
+  for(let i=0; i<arr.length; i++) {
+    let index = Math.floor(Math.random() * arr.length)
+    
+    let temp = arr[i];
+    arr[i] = arr[index];
+    arr[index] = temp;
+  }
+  return arr;
+}
+
+let sortedTo = qSort([...data]);
+//console.log(sortedTo);
+//console.log(shuffle(sortedTo));
+
 
 // 8. Sorting books
+const library = ['A', 'BB', 'mom', 'D', 'Z', 'T', 'BAD', 'pop', 'P', 'Q', 'M', 'BA'];
 
+function bookSorted(arr, start = 0, end = arr.length) {
+  if(start >= end){
+    return arr;
+  }
+
+  const middle = bookPartition(arr, start, end);
+  arr = bookSorted(arr, start, middle);
+  arr = bookSorted(arr, middle + 1, end);
+  return arr;
+}
+
+function bookPartition(arr, start, end) {
+  const pivot = arr[end -1];
+  let j = start;
+
+  for(let i=start; i<end -1; i++) {
+    for(let k=0; k<arr[i].length; k++) {
+      if(pivot[k]) {
+        if(arr[i][k].toLowerCase() < pivot[k].toLowerCase()) {
+          swap(arr, i, j);
+          j++;
+        }
+      }
+      
+    }
+    
+  }
+
+  swap(arr, end -1, j);
+  return j;
+}
+
+
+console.log(bookSorted(library))
 
 
 
