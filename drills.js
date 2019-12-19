@@ -1,3 +1,7 @@
+const LLClass = require('./LinkedList');
+
+
+
 /* 1. Understanding merge sort
 21, 1, 26, 45, 29, 28, 2, 9, 16, 49, 39, 27, 43, 34, 46, 40
 
@@ -54,14 +58,24 @@ Explain your answer.
 left = less than 14 and right = greater than 14. Also, it sorted all items for 17 as well.
 left = less than 17 and right = greater than 17.
 
+Same thing applies to 24 as above
+
 2) Given the following list of numbers 14, 17, 13, 15, 19, 10, 3, 16, 9, 12 
 show the resulting list after the second partitioning according to the quicksort algorithm.
 
 When using the last item on the list as a pivot (pivot = 12)
 [10, 3, 9, 12, 14, 17, 13, 15, 19, 16]
 
+[10, 3, 9] 12, [14, 17, 13, 15, 19, 16]
+
+Answer: [[3] 9, [10]] 12, [[14, 13, 15] 16, [17, 19]]
+
 When using the first item on the list as a pivot (pivot = 14)
 [13, 10, 3, 9, 12, 14, 17, 15, 19, 16]
+
+[13, 10, 3, 9, 12] 14, [17, 15, 19, 16]
+
+Answer: [[10, 3, 9, 12] 13] 14, [[15, 16] 17, [19]]
 
 
 */
@@ -70,22 +84,6 @@ function swap(array, i, j) {
   const tmp = array[i];
   array[i] = array[j];
   array[j] = tmp;
-};
-
-
-function bubbleSort(array) {
-  let swaps = 0;
-  for (let i = 0; i < array.length - 1; i++) {
-    if (array[i] > array[i + 1]) {
-      swap(array, i, i + 1);
-      swaps++;
-    }
-  }
-
-  if (swaps > 0) {
-    return bubbleSort(array);
-  }
-  return array;
 };
 
 
@@ -124,19 +122,19 @@ function partition(array, start, end) {
       j++;
     }
   }
-  swap(array, end-1, j);
+  swap(array, end - 1, j);
   return j;
 };
 
 
 // data
-const data = [89, 30, 25, 32, 72, 70, 51, 42, 25, 
-  24, 53, 55, 78, 50, 13, 40, 48, 32, 26, 2, 14, 
-  33, 45, 72, 56, 44, 21, 88, 27, 68, 15, 62, 93, 
-  98, 73, 28, 16, 46, 87, 28, 65, 38, 67, 16, 85, 
-  63, 23, 69, 64, 91, 9, 70, 81, 27, 97, 82, 6, 88, 
-  3, 7, 46, 13, 11, 64, 76, 31, 26, 38, 28, 13, 17, 
-  69, 90, 1, 6, 7, 64, 43, 9, 73, 80, 98, 46, 27, 22, 87, 
+const data = [89, 30, 25, 32, 72, 70, 51, 42, 25,
+  24, 53, 55, 78, 50, 13, 40, 48, 32, 26, 2, 14,
+  33, 45, 72, 56, 44, 21, 88, 27, 68, 15, 62, 93,
+  98, 73, 28, 16, 46, 87, 28, 65, 38, 67, 16, 85,
+  63, 23, 69, 64, 91, 9, 70, 81, 27, 97, 82, 6, 88,
+  3, 7, 46, 13, 11, 64, 76, 31, 26, 38, 28, 13, 17,
+  69, 90, 1, 6, 7, 64, 43, 9, 73, 80, 98, 46, 27, 22, 87,
   49, 83, 6, 39, 42, 51, 54, 84, 34, 53, 78, 40, 14, 5];
 
 
@@ -147,14 +145,14 @@ function qSort(array, start = 0, end = array.length) {
   if (start >= end) {
     return array;
   }
-  
+
   const middle = partition(array, start, end);
   array = qSort(array, start, middle);
   array = qSort(array, middle + 1, end);
   return array;
 };
 
-console.log(qSort(data));
+//console.log(qSort([...data]));
 
 
 
@@ -172,16 +170,104 @@ function mSort(array) {
   left = mSort(left);
   right = mSort(right);
   return merge(left, right, array);
-};
+}
 
-console.log(mSort(data));
+//console.log(mSort([...data]));
 
 
 
 // 5. Sorting a linked list using merge sort
 
+
+let LL = new LLClass.linkedList();
+
+data.forEach(item => {
+  LL.insertLast(item);
+});
+
+//console.log(LL);
+
+function linkedMerger(left, right) {
+  let currentLeft = left.head;
+  let currentRight = right.head;
+  let final = new LLClass.linkedList();
+
+  while(currentLeft !== null && currentRight !== null) {
+
+    if(currentLeft.value < currentRight.value) {
+      final.insertLast(currentLeft.value);
+      currentLeft = currentLeft.next;
+    } else {
+      final.insertLast(currentRight.value);
+      currentRight = currentRight.next;
+    }
+  }
+
+  while(currentLeft !== null) {
+    final.insertLast(currentLeft.value);
+    currentLeft = currentLeft.next;
+  }
+
+  while(currentRight !== null) {
+    final.insertLast(currentRight.value);
+    currentRight = currentRight.next;
+  }
+
+  return final;
+}
+
+function mergeLinked(ll) {
+  let length = LLClass.size(ll);
+  if(length === 1) {
+    return ll;
+  }
+
+  let middle = LLClass.middle(ll);
+  let leftLL = LLClass.copy(0, middle, ll);
+  let rightLL = LLClass.copy(middle, length, ll);
+
+  let left = mergeLinked(leftLL);
+  let right = mergeLinked(rightLL);
+
+  return linkedMerger(left, right);
+}
+
+let sorted = mergeLinked(LL);
+
+let current = sorted.head;
+
+while(current !== null) {
+  //console.log(current.value);
+  current = current.next;
+}
 // 6. Bucket sort
 
+function bucketSort(arr, min, max) {
+  let numOfArrays = max - min + 1;
+  let listOfArrays = new Array(numOfArrays).fill('');
+
+  for(let i = 0; i < arr.length; i++) {
+    let currentValueArray = listOfArrays[arr[i]- min];
+    if(!currentValueArray) {
+      currentValueArray = [];
+    }
+    currentValueArray.push(arr[i]);
+    listOfArrays[arr[i]-min] = currentValueArray;
+  }
+
+  let sortedArray = [];
+
+  for(let i =0; i< listOfArrays.length; i++) {
+    if(listOfArrays[i]) {
+      listOfArrays[i].forEach(item => sortedArray.push(item));
+    }
+  }
+
+  return sortedArray;
+}
+
+
+console.log(bucketSort([1, 1, 1, 4, 2, 4, 3, 5], 1, 5));
 // 7. Sort in place
 
 // 8. Sorting books
